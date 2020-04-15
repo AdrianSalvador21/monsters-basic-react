@@ -1,24 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
 import './App.css';
+import CardList from "./components/card-list/card-list.component";
+import SeachBox from "./components/search-box/search-box.component";
 
 function App() {
+  // State para Proyecto
+  const [users, saveUsers] = useState([]);
+  const [searchField, setSeatchField] = useState('');
+  const [filterData, setFilterData] = useState([]);
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+
+  const getData = () => {
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then(response => response.json())
+      .then(users => {
+        console.log(users);
+        saveUsers(users);
+        setFilterData(users);
+      });
+  };
+
+  const filterDataEvent = (e) => {
+    console.log(e.target.value);
+    console.log(searchField);
+    if (e.target.value === '') {
+      console.log('VACIO');
+      setFilterData(users);
+      return;
+    }
+    const filteredMonsters = users.filter(monster => monster.name.toLowerCase().includes(e.target.value.toLowerCase()));
+    setFilterData(filteredMonsters);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Monsters Info</h1>
+
+      <SeachBox
+        setSeatchField={setSeatchField}
+        filterDataEvent={filterDataEvent}
+      />
+
+      <CardList users={filterData} />
     </div>
   );
 }
